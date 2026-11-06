@@ -1,6 +1,6 @@
 {
   "name": "@cajax/bulkhead-limit",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Zero-dependency bulkhead concurrency limiter: bounded queue, queue-wait deadlines, abort-aware, priority, adaptive (AIMD) concurrency.",
   "type": "module",
   "main": "dist/index.cjs",
