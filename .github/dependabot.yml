@@ -12,6 +12,10 @@ updates:
     directory: /
     schedule:
       interval: monthly
+    ignore:
+      # Types must match the oldest supported Node version, not the newest.
+      - dependency-name: '@types/node'
+        update-types: [version-update:semver-major]
     groups:
       dev-dependencies:
         dependency-type: development

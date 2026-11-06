@@ -4,6 +4,8 @@ All notable changes to this project are documented in this file. The format foll
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-11-06
+
 ### Fixed
 
 - TypeScript projects that compile to CommonJS (`moduleResolution: node16` or `nodenext`) now get the CommonJS type declarations. Previously TypeScript treated the package as ESM-only and rejected `import` statements that compile to `require()`.
@@ -29,5 +31,6 @@ Initial release. Extracted from [`@cajax/axios-parallel-limit`](https://github.c
 - The pause timer keeps the process alive while tasks are waiting on it, so a script no longer exits silently with queued work during a cooldown. When nothing is queued it still lets the process exit.
 - `parseRetryAfter('1.5')` is parsed as 1.5 s instead of being handed to `Date.parse` (which V8 reads as a date in 2001, giving a 0 ms cooldown).
 
-[Unreleased]: https://github.com/cajax/bulkhead-limit/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/cajax/bulkhead-limit/compare/v0.1.1...HEAD
+[0.1.1]: https://github.com/cajax/bulkhead-limit/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/cajax/bulkhead-limit/releases/tag/v0.1.0
