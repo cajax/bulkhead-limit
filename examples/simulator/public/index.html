@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Bulkhead simulator</title>
+        <meta
+            name="description"
+            content="Send traffic through a real bulkhead-limit instance and change any setting while it runs."
+        />
+        <link
+            rel="icon"
+            href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 20'%3E%3Cpath d='M1 2h24l6 8-6 8H1z' fill='%23d6a94f'/%3E%3Cpath d='M9 2v16M17 2v16' stroke='%230b1622' stroke-width='2'/%3E%3C/svg%3E"
+        />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Semi+Condensed:wght@500;600&display=swap"
+            rel="stylesheet"
+        />
+        <link rel="stylesheet" href="/styles.css" />
+    </head>
+    <body>
+        <header class="topbar">
+            <div class="brand">
+                <svg class="brand-mark" viewBox="0 0 32 20" aria-hidden="true">
+                    <path d="M1 2h24l6 8-6 8H1z" fill="none" stroke="currentColor" stroke-width="2" />
+                    <path d="M9 2v16M17 2v16" stroke="currentColor" stroke-width="2" />
+                </svg>
+                <div>
+                    <h1>Bulkhead simulator</h1>
+                    <p class="tagline">
+                        A real bulkhead-limit instance under simulated traffic. Every setting applies live.
+                    </p>
+                </div>
+            </div>
+            <div class="run-controls">
+                <p class="run-state" id="run-state" role="status" aria-live="polite">
+                    <span class="run-dot" aria-hidden="true"></span><span id="run-label">Stopped</span>
+                    <span class="run-clock" id="run-clock">0.0 s</span>
+                </p>
+                <button class="btn btn-primary" id="btn-start" type="button">Start</button>
+                <button class="btn" id="btn-pause" type="button" disabled>Pause</button>
+                <button class="btn" id="btn-stop" type="button" disabled>Stop</button>
+                <button class="btn btn-icon" id="btn-theme" type="button" aria-label="Switch colour theme">
+                    <svg viewBox="0 0 20 20" aria-hidden="true">
+                        <circle cx="10" cy="10" r="7" fill="none" stroke="currentColor" stroke-width="1.6" />
+                        <path d="M10 3a7 7 0 0 1 0 14z" fill="currentColor" />
+                    </svg>
+                </button>
+            </div>
+        </header>
+
+        <div class="layout">
+            <aside class="rail" aria-label="Settings">
+                <div class="presets">
+                    <label for="preset">Scenario</label>
+                    <select id="preset"></select>
+                    <p class="preset-note" id="preset-note"></p>
+                </div>
+                <div id="controls"></div>
+                <section class="group" aria-labelledby="actions-title">
+                    <h2 id="actions-title">Actions</h2>
+                    <div class="actions">
+                        <button class="btn" id="btn-burst" type="button">Send a burst</button>
+                        <button class="btn" id="btn-hold" type="button">Hold dispatch 3 s</button>
+                        <button class="btn" id="btn-clear" type="button">Clear the queue</button>
+                        <button class="btn" id="btn-reset-backoff" type="button">Reset backoff</button>
+                    </div>
+                </section>
+            </aside>
+
+            <main class="stage">
+                <section class="flow" aria-label="Live view">
+                    <div class="flow-col flow-queue">
+                        <div class="flow-head">
+                            <h2>Waiting</h2>
+                            <p class="flow-figure">
+                                <span id="q-count">0</span><span id="q-limit" class="muted"></span>
+                            </p>
+                        </div>
+                        <div class="queue" id="queue" aria-hidden="true"></div>
+                        <p class="flow-foot muted" id="q-foot">
+                            Bar inside each request: time left before it is dropped (queue deadline or caller patience).
+                            Empty: the caller already left. Notched: high priority.
+                        </p>
+                    </div>
+
+                    <div class="flow-col flow-hull">
+                        <div class="flow-head">
+                            <h2>Running</h2>
+                            <p class="flow-figure">
+                                <span id="h-running">0</span><span class="muted" id="h-limit"></span>
+                            </p>
+                        </div>
+                        <div class="hull" id="hull">
+                            <svg
+                                class="hull-outline"
+                                viewBox="0 0 100 100"
+                                preserveAspectRatio="none"
+                                aria-hidden="true"
+                            >
+                                <path d="M0.5 0.5H93L99.5 50L93 99.5H0.5Z" />
+                            </svg>
+                            <div class="decks" id="decks" aria-hidden="true"></div>
+                            <p class="hull-banner" id="hull-banner" hidden></p>
+                        </div>
+                        <p class="flow-foot muted">
+                            Each compartment is one concurrency slot. Hatched compartments are sealed by adaptive
+                            backoff.
+                        </p>
+                    </div>
+
+                    <div class="flow-col flow-service">
+                        <div class="flow-head">
+                            <h2>Service</h2>
+                            <p class="flow-figure">
+                                <span id="s-load">0</span><span class="muted"> / </span><span id="s-cap">0</span>
+                            </p>
+                        </div>
+                        <div class="gauge" id="gauge" aria-hidden="true">
+                            <div class="gauge-fill" id="gauge-fill"></div>
+                        </div>
+                        <p class="service-state" id="s-state">Idle</p>
+                    </div>
+                </section>
+
+                <section class="tiles" aria-label="Totals">
+                    <div class="tile tile-lead">
+                        <p class="tile-label">Throughput</p>
+                        <p class="tile-value"><span id="m-throughput">0</span><small>/s</small></p>
+                    </div>
+                    <div class="tile tile-lead">
+                        <p class="tile-label">Queue wait, p95</p>
+                        <p class="tile-value"><span id="m-wait">0</span><small>ms</small></p>
+                    </div>
+                    <div class="tile tile-lead">
+                        <p class="tile-label">Response time, p95</p>
+                        <p class="tile-value"><span id="m-latency">0</span><small>ms</small></p>
+                    </div>
+                    <div class="tile tile-lead">
+                        <p class="tile-label">Work done for nobody</p>
+                        <p class="tile-value" id="m-wasted">0</p>
+                    </div>
+                    <div class="tile">
+                        <p class="tile-label"><span class="swatch swatch-1"></span>Completed</p>
+                        <p class="tile-value" id="c-completed">0</p>
+                    </div>
+                    <div class="tile">
+                        <p class="tile-label"><span class="swatch swatch-2"></span>Queue full</p>
+                        <p class="tile-value" id="c-shed">0</p>
+                    </div>
+                    <div class="tile">
+                        <p class="tile-label"><span class="swatch swatch-2"></span>Queue deadline</p>
+                        <p class="tile-value" id="c-timeout">0</p>
+                    </div>
+                    <div class="tile">
+                        <p class="tile-label"><span class="swatch swatch-2"></span>Caller gave up</p>
+                        <p class="tile-value" id="c-gaveup">0</p>
+                    </div>
+                    <div class="tile">
+                        <p class="tile-label">Service said 429</p>
+                        <p class="tile-value" id="c-429">0</p>
+                    </div>
+                    <div class="tile">
+                        <p class="tile-label">Service errors</p>
+                        <p class="tile-value" id="c-errors">0</p>
+                    </div>
+                </section>
+
+                <section class="charts" aria-label="Last 60 seconds">
+                    <figure class="chart">
+                        <figcaption>
+                            <h2>Slots in use</h2>
+                            <p class="legend">
+                                <span class="key key-ink"></span>Running <span class="key key-dash"></span>Limit
+                                <span class="key key-dot"></span>Target
+                            </p>
+                        </figcaption>
+                        <canvas
+                            id="chart-slots"
+                            role="img"
+                            aria-label="Running tasks and concurrency limit over the last 60 seconds"
+                        ></canvas>
+                    </figure>
+                    <figure class="chart">
+                        <figcaption>
+                            <h2>Waiting</h2>
+                            <p class="legend">
+                                <span class="key key-ink"></span>Waiting <span class="key key-dash"></span>Queue limit
+                            </p>
+                        </figcaption>
+                        <canvas
+                            id="chart-queue"
+                            role="img"
+                            aria-label="Waiting requests and queue limit over the last 60 seconds"
+                        ></canvas>
+                    </figure>
+                    <figure class="chart">
+                        <figcaption>
+                            <h2>Outcomes per second</h2>
+                            <p class="legend">
+                                <span class="key key-s1"></span>Completed <span class="key key-s2"></span>Turned away
+                            </p>
+                        </figcaption>
+                        <canvas
+                            id="chart-outcomes"
+                            role="img"
+                            aria-label="Completed and turned-away requests per second over the last 60 seconds"
+                        ></canvas>
+                    </figure>
+                    <section class="log" aria-labelledby="log-title">
+                        <h2 id="log-title">Events</h2>
+                        <ol id="log" class="log-list"></ol>
+                    </section>
+                </section>
+
+                <details class="table-view">
+                    <summary>Show the last 10 seconds as a table</summary>
+                    <div class="table-wrap"><table id="data-table"></table></div>
+                </details>
+            </main>
+        </div>
+        <div class="tooltip" id="tooltip" role="tooltip" hidden></div>
+        <script type="module" src="/app.js"></script>
+    </body>
+</html>
