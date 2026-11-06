@@ -11,14 +11,32 @@
   ],
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
     },
     "./fetch": {
-      "types": "./dist/fetch.d.ts",
-      "import": "./dist/fetch.js",
-      "require": "./dist/fetch.cjs"
+      "import": {
+        "types": "./dist/fetch.d.ts",
+        "default": "./dist/fetch.js"
+      },
+      "require": {
+        "types": "./dist/fetch.d.cts",
+        "default": "./dist/fetch.cjs"
+      }
+    },
+    "./package.json": "./package.json"
+  },
+  "typesVersions": {
+    "*": {
+      "fetch": [
+        "./dist/fetch.d.ts"
+      ]
     }
   },
   "sideEffects": false,
@@ -33,7 +51,8 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "prepublishOnly": "npm run lint && npm test && npm run build",
-    "simulator": "npm run build && node examples/simulator/server.mjs"
+    "simulator": "npm run build && node examples/simulator/server.mjs",
+    "check:package": "publint --strict && attw --pack ."
   },
   "keywords": [
     "bulkhead",
@@ -60,6 +79,7 @@
   },
   "homepage": "https://github.com/cajax/bulkhead-limit",
   "devDependencies": {
+    "@arethetypeswrong/cli": "^0.18.5",
     "@eslint/js": "^9.39.5",
     "@jest/globals": "^30.5.2",
     "@types/jest": "^30.0.0",
@@ -69,6 +89,7 @@
     "globals": "^16.5.0",
     "jest": "^30.5.2",
     "prettier": "^3.9.10",
+    "publint": "^0.3.25",
     "ts-jest": "^29.4.15",
     "tsup": "^8.5.1",
     "typescript": "^5.9.3",

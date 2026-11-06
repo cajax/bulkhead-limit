@@ -4,6 +4,11 @@ All notable changes to this project are documented in this file. The format foll
 
 ## [Unreleased]
 
+### Fixed
+
+- TypeScript projects that compile to CommonJS (`moduleResolution: node16` or `nodenext`) now get the CommonJS type declarations. Previously TypeScript treated the package as ESM-only and rejected `import` statements that compile to `require()`.
+- `@cajax/bulkhead-limit/fetch` now resolves under the legacy `moduleResolution: node`.
+
 ## [0.1.0] - 2026-11-06
 
 Initial release. Extracted from [`@cajax/axios-parallel-limit`](https://github.com/cajax/axios-parallel-limit) 1.1.1 as a transport-agnostic core.
