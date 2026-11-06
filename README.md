@@ -13,12 +13,12 @@ A plain concurrency limiter queues excess work without bound. Under sustained ov
 - **Zero dependencies**, TypeScript-first, ESM + CJS. About 3.5 KB min+gzip (fetch helper: 0.5 KB).
 
 ```bash
-npm install bulkhead-limit
+npm install @cajax/bulkhead-limit
 ```
 
 ## Simulator
 
-[![Simulator during a traffic spike, after concurrency was raised above the service capacity](docs/simulator.png)](examples/README.md#simulator)
+[![Simulator during a traffic spike, after concurrency was raised above the service capacity](https://raw.githubusercontent.com/cajax/bulkhead-limit/main/docs/simulator.png)](examples/README.md#simulator)
 
 [`examples/simulator`](examples/README.md#simulator) runs a real `Bulkhead` in the browser against a simulated downstream service. Traffic, caller behaviour, bulkhead settings and the service's latency, capacity and error rate can all be changed while the simulation runs.
 
@@ -41,7 +41,7 @@ Preset scenarios:
 ## Quick start
 
 ```ts
-import { Bulkhead, isQueueFullError, isQueueTimeoutError } from 'bulkhead-limit';
+import { Bulkhead, isQueueFullError, isQueueTimeoutError } from '@cajax/bulkhead-limit';
 
 const db = new Bulkhead({
   concurrency: 10, // at most 10 queries in flight
@@ -136,7 +136,7 @@ With `adaptive` enabled, each finished task is classified as a **success**, an *
 Feedback is applied before the finished task's slot is released, so the next waiting task already sees the reduced limit and the pause.
 
 ```ts
-import { Bulkhead, parseRetryAfter } from 'bulkhead-limit';
+import { Bulkhead, parseRetryAfter } from '@cajax/bulkhead-limit';
 
 const llm = new Bulkhead({
   concurrency: 8,
@@ -174,8 +174,8 @@ The default classifier counts a resolved task as a success and ignores rejection
 ## fetch
 
 ```ts
-import { Bulkhead } from 'bulkhead-limit';
-import { limitFetch } from 'bulkhead-limit/fetch';
+import { Bulkhead } from '@cajax/bulkhead-limit';
+import { limitFetch } from '@cajax/bulkhead-limit/fetch';
 
 const api = limitFetch(new Bulkhead({ concurrency: 5, maxQueueSize: 50, adaptive: true }));
 

@@ -11,7 +11,7 @@
 // Run: npm run build && node examples/stream-backpressure.mjs
 
 import { Readable } from 'node:stream';
-import { Bulkhead } from 'bulkhead-limit';
+import { Bulkhead } from '@cajax/bulkhead-limit';
 
 const RECORDS = 5_000;
 const HIGH_WATER = 64; // pause reading at this many waiting records…

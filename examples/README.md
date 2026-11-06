@@ -2,7 +2,7 @@
 
 Each example is a single runnable file. The downstream (a database, an LLM provider, a payment gateway) is simulated locally, so no network access or API keys are needed. Each example runs the scenario with and without the bulkhead and prints the results.
 
-Build the library once first. The examples import `bulkhead-limit` by its package name, the same way your code would:
+Build the library once first. The examples import `@cajax/bulkhead-limit` by its package name, the same way your code would:
 
 ```bash
 npm install

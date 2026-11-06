@@ -8,7 +8,7 @@
 //
 // Run: npm run build && node examples/graceful-shutdown.mjs
 
-import { Bulkhead, isQueueClearedError } from 'bulkhead-limit';
+import { Bulkhead, isQueueClearedError } from '@cajax/bulkhead-limit';
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 

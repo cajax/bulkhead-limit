@@ -13,7 +13,7 @@
 // Run: npm run build && node examples/api-load-shedding.mjs
 
 import http from 'node:http';
-import { Bulkhead, isQueueFullError, isQueueTimeoutError } from 'bulkhead-limit';
+import { Bulkhead, isQueueFullError, isQueueTimeoutError } from '@cajax/bulkhead-limit';
 
 const QUERY_MS = 100;
 const DB_CONNECTIONS = 4;

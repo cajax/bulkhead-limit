@@ -10,7 +10,7 @@ Extracted from [`@cajax/axios-parallel-limit`](https://github.com/cajax/axios-pa
 - `Bulkhead.configure()`: change concurrency, queue limit, queue deadline and adaptive settings on a live bulkhead. Validates everything first and changes nothing on error.
 - Runnable examples in `examples/` and an interactive simulator (`npm run simulator`).
 - `AdaptiveConcurrency`: AIMD control decoupled from HTTP (`reportOverload({ retryAfterMs })` / `reportSuccess()`), with a configurable `decreaseWindowMs` (previously a hard-coded 200 ms).
-- `bulkhead-limit/fetch`: `limitFetch()` wrapper; 429/503 + `Retry-After` drive adaptive control.
+- `@cajax/bulkhead-limit/fetch`: `limitFetch()` wrapper; 429/503 + `Retry-After` drive adaptive control.
 - Transport-agnostic errors: `QueueFullError`, `QueueTimeoutError`, `QueueClearedError`, with guards.
 - `parseRetryAfter()` returns `undefined` for unparseable values (callers choose the fallback).
 

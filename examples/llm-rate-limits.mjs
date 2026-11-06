@@ -13,8 +13,8 @@
 // Run: npm run build && node examples/llm-rate-limits.mjs
 
 import http from 'node:http';
-import { Bulkhead } from 'bulkhead-limit';
-import { limitFetch } from 'bulkhead-limit/fetch';
+import { Bulkhead } from '@cajax/bulkhead-limit';
+import { limitFetch } from '@cajax/bulkhead-limit/fetch';
 
 const PROVIDER_CONCURRENCY = 6;
 const PROMPTS = 120;

@@ -13,7 +13,7 @@
 // Run: npm run build && node examples/cancel-on-disconnect.mjs
 
 import http from 'node:http';
-import { Bulkhead } from 'bulkhead-limit';
+import { Bulkhead } from '@cajax/bulkhead-limit';
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 

@@ -11,7 +11,7 @@ labels: bug
 ### Minimal reproduction
 
 ```ts
-import { Bulkhead } from 'bulkhead-limit';
+import { Bulkhead } from '@cajax/bulkhead-limit';
 
 // smallest snippet that shows the problem
 ```
@@ -20,6 +20,6 @@ import { Bulkhead } from 'bulkhead-limit';
 
 ### Environment
 
-- bulkhead-limit version:
+- @cajax/bulkhead-limit version:
 - Runtime and version (Node / Bun / Deno / browser):
 - Module format (ESM / CJS):
